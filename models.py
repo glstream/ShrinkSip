@@ -37,6 +37,7 @@ class DrinkingWindow(Base):
 
     # Relationships
     user = relationship("User", back_populates="drinking_windows")
+    
 
 class DrinkEntry(Base):
     __tablename__ = 'drink_entries'

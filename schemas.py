@@ -24,21 +24,29 @@ class UserOut(UserBase):
 
     class Config:
         orm_mode = True
+        
 
 class DrinkingWindowBase(BaseModel):
     start_time: time
     end_time: time
-    start_date: Optional[datetime]
-    end_date: Optional[datetime]
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
     repeat_pattern: Optional[str] = 'daily'
     is_active: Optional[bool] = True
 
 class DrinkingWindowCreate(DrinkingWindowBase):
     pass
 
-class DrinkingWindowOut(DrinkingWindowBase):
+class DrinkingWindowUpdate(DrinkingWindowBase):
+    pass
+
+class DrinkingWindowOut(BaseModel):
     id: int
     user_id: int
+    start_time: time
+    end_time: time
+    repeat_pattern: Optional[str]
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 
