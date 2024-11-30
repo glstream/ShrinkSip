@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Time, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from datetime import datetime, time
 
 Base = declarative_base()
 
@@ -19,7 +19,8 @@ class User(Base):
 
     # Relationships
     drinking_windows = relationship("DrinkingWindow", back_populates="user")
-    drink_entries = relationship("DrinkEntry", back_populates="user")
+    drink_logs = relationship("DrinkLog", back_populates="user")
+
 
 class DrinkingWindow(Base):
     __tablename__ = 'drinking_windows'
@@ -27,29 +28,25 @@ class DrinkingWindow(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     start_time = Column(Time, nullable=False)
-    end_time = Column(Time, nullable=False)
-    start_date = Column(DateTime, nullable=True)
-    end_date = Column(DateTime, nullable=True)
-    repeat_pattern = Column(String(50), default='daily')  # Options: 'daily', 'weekdays', 'weekends', 'custom'
+    end_time = Column(Time, nullable=False)  # Pre-calculated
+    duration_hours = Column(Integer, nullable=False)  # Store duration as well
+    repeat_pattern = Column(String(50), default='daily')
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
     # Relationships
     user = relationship("User", back_populates="drinking_windows")
-    
 
-class DrinkEntry(Base):
-    __tablename__ = 'drink_entries'
+class DrinkLog(Base):
+    __tablename__ = "drink_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    drink_type = Column(String(100), nullable=False)
-    quantity = Column(Float, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    drink_type = Column(String, nullable=False)
+    quantity = Column(Float, nullable=False)  # E.g., 1 beer, 0.5 wine glass
     timestamp = Column(DateTime, default=datetime.utcnow)
-    is_within_drinking_window = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    logged_in_window = Column(Boolean, nullable=False)
 
-    # Relationships
-    user = relationship("User", back_populates="drink_entries")
+    user = relationship("User", back_populates="drink_logs")
